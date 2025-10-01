@@ -13,6 +13,8 @@ await connectDB();
 // Middlewares
 app.use(cors());
 
+app.use(express.json());
+
 // Routes
 app.get('/', (req, res)=> res.send('Api working'));
 app.post("/clerk", express.raw({ type: "application/json" }), clerkWebHooks);

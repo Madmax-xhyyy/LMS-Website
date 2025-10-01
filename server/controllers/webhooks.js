@@ -3,7 +3,7 @@ import User from "../models/User.js";
 
 export const clerkWebHooks = async (req, res) => {
   try {
-    const payload = req.body; // raw body comes from express.raw()
+     const payload = req.body; // Buffer from express.raw()
     const headers = {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
@@ -11,9 +11,11 @@ export const clerkWebHooks = async (req, res) => {
     };
 
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
-    wh.verify(payload, headers);
 
-    const { data, type } = JSON.parse(payload);
+    // ✅ Verify & decode
+    const evt = wh.verify(payload.toString("utf8"), headers);
+
+    const { data, type } = evt;
 
     switch (type) {
       case "user.created": {
