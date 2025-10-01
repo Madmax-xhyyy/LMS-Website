@@ -32,7 +32,7 @@ export const clerkWebHooks = async (req, res)=> {
           imageUrl: data.image_url,
         }
         await User.findByIdAndUpdate(data.id, userData);
-        re.json({});
+        res.json({});
         break;
       }
       case 'user.deleted':{
@@ -44,7 +44,7 @@ export const clerkWebHooks = async (req, res)=> {
         break;
     }
   }catch(error){
-    re.json({success: false, message: error.message});
+    res.json({success: false, message: error.message});
     console.log("something wrong with the api function controller");
   }
 }
