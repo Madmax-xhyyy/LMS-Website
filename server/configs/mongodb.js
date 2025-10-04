@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 // Connect to the MongoDB database
-
 const connectDB = async ()=> {
   try{
     mongoose.connection.on('connected', ()=> console.log('Database Connected'));
