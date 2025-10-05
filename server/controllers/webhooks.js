@@ -53,71 +53,72 @@ export const clerkWebHooks = async (req, res)=> {
 
 
 //Stripe webhooks
-const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
-export const stripeWebhooks = async(request, response)=> {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+export const stripeWebhooks = async (req, res) => {
+  const sig = req.headers["stripe-signature"];
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
   let event;
-  if (endpointSecret) {
-    // Get the signature sent by Stripe
-    const signature = request.headers['stripe-signature'];
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.error("⚠️ Webhook signature verification failed:", err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // ✅ Handle successful payment
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const { purchaseId } = session.metadata;
+
     try {
-      event = stripe.webhooks.constructEvent(
-        request.body,
-        signature,
-        endpointSecret
-      );
-
-    } catch (err) {
-      console.log(`⚠️ Webhook signature verification failed.`, err.message);
-      return response.sendStatus(400);
-    }
-
-    switch (event.type) {
-    case 'payment_intent.succeeded':
-      {
-      const paymentIntent = event.data.object;
-      const paymentIntendId = paymentIntent.id;
-      const session = await stripeInstance.checkout.sessions.list({
-        payment_intent: paymentIntendId
-      });
-      const {purchaseId} = session.data[0].metadata;
       const purchaseData = await Purchase.findById(purchaseId);
       const userData = await User.findById(purchaseData.userId);
-      const courseData = await Course.findById(purchaseData.courseId.toString());
+      const courseData = await Course.findById(purchaseData.courseId);
 
-      courseData.enrolledStudents.push(userData);
-      await courseData.save();
+      if (!purchaseData || !userData || !courseData) {
+        console.error("Missing data in webhook");
+        return res.status(400).send("Invalid purchase references");
+      }
 
-      userData.enrolledCourses.push(courseData._id);
-      await userData.save();
+      // Update relationships
+      if (!courseData.enrolledStudents.includes(userData._id)) {
+        courseData.enrolledStudents.push(userData._id);
+        await courseData.save();
+      }
 
-      purchaseData.status = 'Completed';
+      if (!userData.enrolledCourses.includes(courseData._id)) {
+        userData.enrolledCourses.push(courseData._id);
+        await userData.save();
+      }
+
+      purchaseData.status = "Completed";
       await purchaseData.save();
 
-      break;
+      console.log("✅ Payment completed for purchase:", purchaseId);
+    } catch (error) {
+      console.error("Error processing webhook:", error);
+      return res.status(500).send("Server error");
     }
-    case 'payment_intent.payment_failed':
-      {
-       const paymentIntent = event.data.object;
-      const paymentIntendId = paymentIntent.id;
-      const session = await stripeInstance.checkout.sessions.list({
-        payment_intent: paymentIntendId
-      });
-      const {purchaseId} = session.data[0].metadata;
+  }
 
+  // ✅ Handle failed payments
+  if (event.type === "payment_intent.payment_failed") {
+    const paymentIntent = event.data.object;
+    const session = await stripe.checkout.sessions.list({
+      payment_intent: paymentIntent.id,
+    });
+
+    if (session.data.length > 0) {
+      const { purchaseId } = session.data[0].metadata;
       const purchaseData = await Purchase.findById(purchaseId);
-      purchaseData.status = 'Failed';
-      await purchaseData.save();
-      
-      break;
+      if (purchaseData) {
+        purchaseData.status = "Failed";
+        await purchaseData.save();
+      }
     }
-    // ... handle other event types
-    default:
-      console.log(`Unhandled event type ${event.type}`);
   }
 
-  // Return a response to acknowledge receipt of the event
-  response.json({received: true});
-  }
-
-}
+  res.json({ received: true });
+};
