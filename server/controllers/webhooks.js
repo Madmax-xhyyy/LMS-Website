@@ -51,8 +51,9 @@ export const clerkWebHooks = async (req, res)=> {
   }
 }
 
-const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 //Stripe webhooks
+const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const stripeWebhooks = async(request, response)=> {
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
   let event;
@@ -60,7 +61,7 @@ export const stripeWebhooks = async(request, response)=> {
     // Get the signature sent by Stripe
     const signature = request.headers['stripe-signature'];
     try {
-      event = Stripe.webhooks.constructEvent(
+      event = stripe.webhooks.constructEvent(
         request.body,
         signature,
         endpointSecret
@@ -82,7 +83,7 @@ export const stripeWebhooks = async(request, response)=> {
       const {purchaseId} = session.data[0].metadata;
       const purchaseData = await Purchase.findById(purchaseId);
       const userData = await User.findById(purchaseData.userId);
-      const courseData = await Course.findById(purchaseId.courseId.toString());
+      const courseData = await Course.findById(purchaseData.courseId.toString());
 
       courseData.enrolledStudents.push(userData);
       await courseData.save();

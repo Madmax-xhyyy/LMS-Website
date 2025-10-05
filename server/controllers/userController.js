@@ -48,7 +48,7 @@ export const purchaseCourse = async(req, res)=> {
     const purchaseData = {
       courseId: courseData._id,
       userId,
-      amount: (courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2),
+      amount: Number(courseData.coursePrice - courseData.discount * courseData.coursePrice / 100).toFixed(2),
     }
 
     const newPurchase = await Purchase.create(purchaseData);
@@ -65,7 +65,7 @@ export const purchaseCourse = async(req, res)=> {
         product_data: {
           name: courseData.courseTitle
         },
-        unit_amount: Math.floor(newPurchase.amount) * 100
+        unit_amount: Math.round(newPurchase.amount * 100),
       },
       quantity: 1
     }];
@@ -83,6 +83,7 @@ export const purchaseCourse = async(req, res)=> {
     res.json({success: true, session_url: session.url});
 
   }catch(error){
+    console.error("Stripe Error:", error);
     res.json({success: false, message: error.message});
   }
 }
