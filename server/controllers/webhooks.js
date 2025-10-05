@@ -51,7 +51,7 @@ export const clerkWebHooks = async (req, res)=> {
   }
 }
 
-const stripeInstance = new Stripe(process.env.STRIPE_WEBHOOK_SECRET);
+const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 //Stripe webhooks
 export const stripeWebhooks = async(request, response)=> {
   const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -95,7 +95,7 @@ export const stripeWebhooks = async(request, response)=> {
 
       break;
     }
-    case 'payment_method.payment_failed':
+    case 'payment_intent.payment_failed':
       {
        const paymentIntent = event.data.object;
       const paymentIntendId = paymentIntent.id;
