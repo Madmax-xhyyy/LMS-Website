@@ -2,6 +2,7 @@ import { clerkClient } from "@clerk/express";
 import Course from "../models/Course.js";
 import { v2 as cloudinary } from 'cloudinary';
 import Purchase from "../models/Purchase.js";
+import User from "../models/User.js";
 
 // Update Role to Educator
 export const updateRoleToEducator = async (req, res) => {
@@ -21,7 +22,6 @@ export const updateRoleToEducator = async (req, res) => {
 
 
 // Add New Course
-
 export const addCourse = async (req, res)=> {
   try{
     const {courseData} = req.body;
@@ -61,7 +61,6 @@ export const getEducatorCourses = async (req, res)=> {
 }
 
 // Get Educator Dashboard Data
-
 export const educatorDashboardData = async (req, res)=> {
   try{
     const {userId: educator} = req.auth();
@@ -85,7 +84,7 @@ export const educatorDashboardData = async (req, res)=> {
         _id: {$in: course.enrolledStudents}
       }, 'name imageUrl');
 
-      students.foreach(student => {
+      students.forEach(student => {
         enrolledStudentsData.push({
           courseTitle: course.courseTitle,
           student
@@ -112,7 +111,7 @@ export const getEnrolledStudentsData = async(req, res)=> {
       status: 'Completed'
     }).populate('userId', 'name imageUrl').populate('courseId', 'courseTitle');
 
-    const enrolledStudents = purchase.map(purchase => ({
+    const enrolledStudents = purchases.map(purchase => ({
       student: purchase.userId,
       courseTitle: purchase.courseId.courseTitle,
       purchaseDate: purchase.createdAt
