@@ -12,6 +12,7 @@ import MyCourses from './pages/educator/MyCourses'
 import StudentsEnrolled from './pages/educator/StudentsEnrolled'
 import Navbar from './components/student/Navbar'
 import "quill/dist/quill.snow.css";
+import { ToastContainer } from 'react-toastify';
 
 import {
   SignedIn,
@@ -23,42 +24,23 @@ import {
 } from '@clerk/clerk-react'
 
 const App = () => {
-  const isEducatorRoute = useMatch('/educator/*')
+  const isEducatorRoute = useMatch('/educator/*');
+  
 
   return (
     <div className="min-h-screen bg-white">
+      <ToastContainer />
       {!isEducatorRoute && <Navbar />}
 
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<SignIn />} />
-
+        <Route path="/course-list" element={<CourseList />} />
+        <Route path="/course-list/:input" element={<CourseList />} />
+        <Route path="/course/:id" element={<CourseDetails />} />
+        
         {/* Protected student routes */}
-        <Route
-          path="/course-list"
-          element={
-            <SignedIn>
-              <CourseList />
-            </SignedIn>
-          }
-        />
-        <Route
-          path="/course-list/:input"
-          element={
-            <SignedIn>
-              <CourseList />
-            </SignedIn>
-          }
-        />
-        <Route
-          path="/course/:id"
-          element={
-            <SignedIn>
-              <CourseDetails />
-            </SignedIn>
-          }
-        />
         <Route
           path="/my-enrollments"
           element={

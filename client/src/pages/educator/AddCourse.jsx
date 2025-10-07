@@ -1,9 +1,14 @@
 import uniqid from 'uniqid';
 import Quill from 'quill';
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { assets } from '../../assets/assets';
+import { AppContext } from '../../context/AppContext';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { CloudDownload } from 'lucide-react';
 
 const AddCourse = () => {
+  const {backendUrl, getToken} = useContext(AppContext);
   const quillRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -22,7 +27,47 @@ const AddCourse = () => {
       isPreviewFree: false
     }
   );
+// Submit Course Data
+  const handleSubmit = async(e)=> {
+    try{
+      e.preventDefault();
+      if(!image){
+        toast.error('Thumbnail Not Selected');
+        return;
+      }
 
+      const courseData = {
+        courseTitle,
+        courseDescription: quillRef.current.root.innerHTML,
+        coursePrice: Number(coursePrice),
+        discount: Number(discount),
+        courseContent: chapters,
+      }
+
+      const formData = new FormData();
+      formData.append('courseData', JSON.stringify(courseData));
+      formData.append('image', image);
+
+      const token = await getToken();
+      const {data} = await axios.post(`${backendUrl}/api/educator/add-course`, formData, {headers: {Authorization: `Bearer ${token}`},});
+
+      if(data.success){
+        toast.success(data.message);
+        setCourseTitle('');
+        setCoursePrice(0);
+        setDiscount(0);
+        setImage(null),
+        setChapters([]),
+        quillRef.current.root.innerHTML = '';
+      }else{
+        toast.error(data.message);
+      }
+    }catch(error){
+      toast.error(error.message);
+    }
+  }
+  
+  // Handle Chapter and Lecture Actions
   const handleChapter = (action, chapterId)=> {
     if(action === 'add'){
       const title = prompt('Enter chapter name:');
@@ -55,7 +100,9 @@ const AddCourse = () => {
       setChapters(
         chapters.map((chapter)=> {
           if(chapter.chapterId === chapterId){
-            chapter.chapterContent.splice(lectureIndex, 1);
+            const newContent = [...chapter.chapterContent];
+            newContent.splice(lectureIndex, 1);
+            return { ...chapter, chapterContent: newContent };
           }
           return chapter;
         })
@@ -86,10 +133,6 @@ const AddCourse = () => {
     });
   };
 
-  const handleSubmit = async (e)=> {
-    e.preventDefault();
-  }
-
   useEffect(()=> {
     // Initiate Quill only once
     if(!quillRef.current && editorRef.current){
@@ -100,30 +143,30 @@ const AddCourse = () => {
   }, []);
 
   return (
-    <div className='h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 pt-8 pb-0'>
-      <form onSubmit={handleSubmit} className='flex flex-col gap-2'>
+    <div className='min-h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 pt-6 pb-2'>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-2 mx-2 p-4 mb-10 border border-gray-300 rounded'>
         <div className="flex flex-col gap-1">
-          <p>Course Title:</p>
+          <p className='font-semibold text-sm md:text-base'>Course Title:</p>
           <input onChange={e => setCourseTitle(e.target.value)} value={courseTitle} type="text" placeholder='Type here' className='outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500' required/>
         </div>
         <div className="flex flex-col gap-1">
-          <p>Course Description</p>
-          <div ref={editorRef}></div>
+          <p className='font-semibold text-sm md:text-base'>Course Description</p>
+          <div className='w-full max-w-100 overflow-hidden break-words' ref={editorRef}></div>
         </div>
         <div className='flex justify-between items-start'>
           <div className='flex flex-col gap-1'>
-            <p>Course Price</p>
+            <p className='font-semibold text-sm md:text-base'>Course Price</p>
             <input onChange={e => setCoursePrice(e.target.value)} value={coursePrice} type="number" placeholder='0' className='outline-none md:py-2.5 py-2 w-28 px-3 rounded border border-gray-500' required />
             <div className="flex flex-col gap-1">
-            <p>Discount %</p>
+            <p className='font-semibold text-sm md:text-base'>Discount %</p>
             <input onChange={e => setDiscount(e.target.value)} value={discount} type="number" placeholder='0' min={0} max={100} className='outline-none md:py-2.5 py-2 w-28 px-3 rounded border border-gray-500' required />
           </div>
           
           </div>
-          <div className="flex md:flex-row flex-col items-center gap-3">
-              <p>Course Thumbnail</p>
-              <label htmlFor="thumbnailImage" className='flex items-center gap-3'>
-                <img src={assets.file_upload_icon} alt="" className='p-3 bg-blue-500 rounded' />
+          <div className="flex flex-col items-center gap-3">
+              <p className='font-semibold text-sm md:text-base'>Course Thumbnail</p>
+              <label htmlFor="thumbnailImage" className='flex flex-col md:flex-row items-center gap-3'>
+                <span className='bg-green-500 p-2 rounded'><CloudDownload color="#ffffff" /></span>
                 <input type="file" id='thumbnailImage' onChange={e => setImage(e.target.files[0])} accept='image/*' hidden />
                 <img className='max-h-10' src={image ? URL.createObjectURL(image) : ''} alt="" />
               </label>
@@ -136,7 +179,7 @@ const AddCourse = () => {
                 <div className="flex justify-between items-center p-4 border-b">
                   <div className='flex items-center'>
                     <img onClick={()=> handleChapter('toggle', chapter.chapterId)} src={assets.dropdown_icon} width={14} alt="" className={`mr-2 cursor-pointer transition-all ${chapter.collapsed && "-rotate-90"}`}/>
-                    <span className='font-semibold'>{chapterIndex + 1} {chapter.chapterTitle}</span>
+                    <span className='font-semibold text-sm md:text-base'>{chapterIndex + 1} {chapter.chapterTitle}</span>
                   </div>
                   <span className='text-gray-500'>{chapter.chapterContent.length} Lectures</span>
                   <img onClick={()=> handleChapter('remove', chapter.chapterId)} src={assets.cross_icon} alt="" className='cursor-pointer'/>
@@ -152,18 +195,17 @@ const AddCourse = () => {
                         <img src={assets.cross_icon} alt="" className='cursor-pointer' onClick={()=> handleLecture('remove', chapter.chapterId, lectureIndex)} />
                       </div>
                     ))}
-                    <div onClick={()=> handleLecture('add', chapter.chapterId)} className="inline-flex bg-gray-100 p-2 rounded cursor-pointer mt-2">+ Add Lecture</div>
+                    <div onClick={()=> handleLecture('add', chapter.chapterId)} className="inline-flex bg-gray-100 p-2 rounded cursor-pointer mt-2 font-semibold">+ Add Lecture</div>
                   </div>
                 )}
               </div>
             ))}
-            <div onClick={()=> handleChapter("add")}  className='flex justify-center items-center bg-blue-100 p-2 rounded-lg cursor-pointer'>+ Add Chapter</div>
+            <div onClick={()=> handleChapter("add")}  className='flex justify-center items-center bg-green-100 p-2 rounded-lg cursor-pointer font-semibold'>+ Add Chapter</div>
             {showPopup && (
               <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50'>
                 <div className='bg-white text-gray-700 p-4 rounded relative w-full max-w-80'>
                   <h2 className='text-lg font-semibold mb-4'>Add Lecture</h2>
                   <div className="mb-2">
-                    <p>Lecture Title</p>
                     <input 
                     type="text"
                     className='mt-1 block w-full border rounded py-1 px-2'
@@ -173,7 +215,7 @@ const AddCourse = () => {
                   </div>
 
                   <div className="mb-2">
-                    <p>Duration (minutes)</p>
+                    <p className='font-semibold'>Duration (minutes)</p>
                     <input 
                     type="text"
                     className='mt-1 block w-full border rounded py-1 px-2'
@@ -183,7 +225,7 @@ const AddCourse = () => {
                   </div>
 
                   <div className="mb-2">
-                    <p>Lecture URL</p>
+                    <p className='font-semibold'>Lecture URL</p>
                     <input 
                     type="text"
                     className='mt-1 block w-full border rounded py-1 px-2'
@@ -193,21 +235,21 @@ const AddCourse = () => {
                   </div>
 
                   <div className="mb-2 flex gap-2">
-                    <p>Is Preview Free?</p>
-                    <input 
+                    <p className='font-semibold'>Is Preview Free?</p>
+                    <input
                     type="checkbox"
                     className='mt-1 scale-125'
-                    value={lectureDetails.isPreviewFree}
-                    onChange={(e) => setLectureDetails({...lectureDetails, isPreviewFree: e.target.value})}
+                    checked={lectureDetails.isPreviewFree}
+                    onChange={(e) => setLectureDetails({...lectureDetails, isPreviewFree: e.target.checked})}
                       />
                   </div>
-                  <button onClick={addLecture} className='w-full bg-blue-400 text-white px-4 py-2 rounded' type='button'>Add</button>
+                  <button onClick={addLecture} className='w-full bg-blue-500 text-white px-4 py-2 rounded font-semibold cursor-pointer' type='button'>Add</button>
                   <img onClick={()=> setShowPopup(false)} src={assets.cross_icon} alt="cross icon" className='absolute top-4 right-4 w-4 cursor-pointer' />
                 </div>
               </div>
             )}
           </div>
-        <button className='bg-black text-white w-max py-2.5 px-8 rounded my-4' type='submit'>ADD</button>
+        <button className='bg-black text-white w-max py-2.5 px-8 rounded my-4 cursor-pointer font-semibold' type='submit'>ADD COURSE</button>
       </form>
     </div>
   )

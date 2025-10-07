@@ -31,7 +31,7 @@ const CourseList = () => {
       <div className="flex flex-col md:flex-row w-full justify-between">
         <div className="flex flex-col gap-1 mb-2">
           <h1 className="text-2xl sm:text-3xl font-bold">Course List</h1>
-          <p className="text-xs sm:text-base"><span className="text-blue-600 cursor-pointer" onClick={()=> navigate('/')}>Home</span> / <span className="text-gray-600 ">Course List</span></p>
+          <p className="text-xs sm:text-base"><span className="text-green-600 cursor-pointer" onClick={()=> navigate('/')}>Home</span> / <span className="text-gray-600 ">Course List</span></p>
         </div>
         <SearchBar data={input} />
       </div>

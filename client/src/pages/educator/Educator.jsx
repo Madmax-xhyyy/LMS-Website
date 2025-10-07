@@ -1,7 +1,7 @@
-import { Outlet } from "react-router-dom"
-import Navbar from "../../components/educator/Navbar"
-import SideBar from "../../components/educator/SideBar"
-import Footer from "../../components/educator/Footer"
+import { Outlet } from "react-router-dom";
+import Navbar from "../../components/educator/Navbar";
+import SideBar from "../../components/educator/SideBar";
+import Footer from "../../components/educator/Footer";
 
 const Educator = () => {
   return (
@@ -9,7 +9,7 @@ const Educator = () => {
       <Navbar />
       <div className="flex">
         <SideBar />
-        <div className="flex-1">
+        <div className="flex-1 w-auto overflow-hidden">
           <Outlet />
         </div>
       </div>
@@ -18,4 +18,4 @@ const Educator = () => {
   )
 }
 
-export default Educator
+export default Educator;

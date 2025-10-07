@@ -32,7 +32,6 @@ import instagram_icon from './instagram_icon.svg'
 import twitter_icon from './twitter_icon.svg'
 import file_upload_icon from './file_upload_icon.svg'
 import appointments_icon from './appointments_icon.svg'
-import earning_icon from './earning_icon.svg'
 import dropdown_icon from './dropdown_icon.svg'
 import patients_icon from './patients_icon.svg'
 import play_icon from './play_icon.svg'
@@ -42,9 +41,13 @@ import profile_img from './profile_img.png'
 import profile_img2 from './profile_img2.png'
 import profile_img3 from './profile_img3.png'
 import lesson_icon from './lesson_icon.svg'
-
+import book_icon from './book.png'
+import chat_icon from './chat.png'
+import earning_icon from './earning.png'
 
 export const assets = {
+    chat_icon,
+    book_icon,
     logo,
     search_icon,
     sketch,

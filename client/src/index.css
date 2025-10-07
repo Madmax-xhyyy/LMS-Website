@@ -1,13 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&display=swap');
 @import "tailwindcss";
 
 *{
-   font-family: "Lato", sans-serif;
+   font-family: "Inconsolata", monospace;
 }
 
 @layer base{
    html {
       scroll-behavior: smooth;
+   }
+   .ql-editor {
+   white-space: normal !important;
+   word-break: break-word !important;
+   overflow-wrap: break-word !important;
    }
 }
 

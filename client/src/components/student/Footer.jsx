@@ -1,11 +1,11 @@
+import { GraduationCap } from 'lucide-react';
 
 const Footer = () => {
   return (
-   <footer className="flex flex-col text-center bg-[#111827] w-full text-white py-6 px-6 sm:pt-12 sm:px-16">
+   <footer className="flex flex-col text-center bg-[#062218] w-full text-white py-6 px-6 sm:pt-12 sm:px-16">
     <div className="flex items-start justify-between mb-10 gap-4">
       <a href="" className="flex items-center cursor-pointer">
-        <img src="/icon.png" alt="logo" className="w-8 " />
-        <p className="font-semibold sm:text-xl sm:font-bold">NeuroLearn</p>
+        <p className="font-semibold sm:text-xl sm:font-bold flex gap-1"><GraduationCap color="#ffffff" /> NeuroLearn</p>
       </a>
       <div className="text-start">
         <h2 className="font-semibold">Company</h2>
@@ -21,7 +21,7 @@ const Footer = () => {
         <p className="text-gray-300">The latest news, articles, and resources, sent to your inbox weekly.</p>
         <div className="flex gap-2">
           <input type="email" placeholder="Enter your email" className="bg-gray-700 borde-2 border-gray-600 p-2 rounded" />
-          <button className="bg-blue-800 py-2 px-4 rounded cursor-pointer">Subscribe</button>
+          <button className="bg-green-800 py-2 px-4 rounded cursor-pointer">Subscribe</button>
         </div>
       </div>
     </div>

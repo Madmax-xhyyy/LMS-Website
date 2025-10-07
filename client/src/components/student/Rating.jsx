@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 const Rating = ({initialRating, onRate}) => {
 
@@ -11,7 +11,7 @@ const Rating = ({initialRating, onRate}) => {
 
   useEffect(()=>{
     if(initialRating){
-      setRating(initialRating)
+      setRating(initialRating);
     }
   }, [initialRating]);
   return (
@@ -26,4 +26,4 @@ const Rating = ({initialRating, onRate}) => {
   )
 }
 
-export default Rating
+export default Rating;

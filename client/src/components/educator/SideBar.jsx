@@ -1,16 +1,16 @@
 import { useContext } from "react";
-import { assets } from "../../assets/assets";
 import { AppContext } from "../../context/AppContext";
 import { NavLink } from "react-router-dom";
+import { Folders, LayoutDashboard, SquarePlus, Users } from "lucide-react";
 
 const SideBar = () => {
   const {isEducator} = useContext(AppContext);
 
   const menuItems = [
-    {name: 'Dashboard', path: '/educator', icon: assets.home_icon},
-    {name: 'Add Acourse', path: '/educator/add-course', icon: assets.add},
-    {name: 'My Courses', path: '/educator/my-courses', icon: assets.my_course_icon}, 
-    {name: 'Student Enrolled', path: '/educator/students-enrolled', icon: assets.person_tick_icon},
+    {name: 'Dashboard', path: '/educator', icon: <LayoutDashboard />},
+    {name: 'Add Course', path: '/educator/add-course', icon: <SquarePlus />},
+    {name: 'My Courses', path: '/educator/my-courses', icon: <Folders />}, 
+    {name: 'Student Enrolled', path: '/educator/students-enrolled', icon: <Users />},
   ];
 
   return isEducator && (
@@ -20,9 +20,9 @@ const SideBar = () => {
           to={item.path}
           key={item.name}
           end={item.path === '/educator'}
-          className={({isActive})=> `flex items-center md:flex-row flex-col md:justify-start justify-center py-3.5 md:px-10 gap-3 ${isActive ? 'bg-indigo-50 border-r-[6px] border-indigo-500/90' : 'hover:bg-gray-100/90 border-r-[6px] border-white hover:border-gray-100/90'}`}
+          className={({isActive})=> `flex items-center md:flex-row flex-col md:justify-start justify-center py-3.5 md:px-10 gap-3 ${isActive ? 'bg-green-50 border-r-[6px] border-green-500/90' : 'hover:bg-gray-100/90 border-r-[6px] border-white hover:border-gray-100/90'}`}
         >
-          <img src={item.icon} alt='' className="w-6 h-6" />
+          <span>{item.icon}</span>
           <p className="md:block hidden text-center">{item.name}</p>
         </NavLink>
       ))}
@@ -30,4 +30,4 @@ const SideBar = () => {
   )
 }
 
-export default SideBar
+export default SideBar;

@@ -25,7 +25,7 @@ const CourseCard = ({ course }) => {
               {course.courseTitle}
             </h3>
             <p className="text-xs sm:text-sm text-gray-600 mb-2">
-               NeuroLearn
+               
             </p>
           </div>
           
