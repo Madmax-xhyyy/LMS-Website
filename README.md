@@ -69,7 +69,7 @@ cd LMS-Website
 
 ---
 
-###2️⃣ Setup the Backend
+### 2️⃣ Setup the Backend
 ```bash
 cd server
 npm install
