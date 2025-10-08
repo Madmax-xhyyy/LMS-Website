@@ -133,14 +133,10 @@ npm run dev
 
 ---
 
-🤝 Contributing
+## 🤝 Contributing
 
-Contributions are welcome!
-
-Fork the repo
-
-Create a new branch (feature/my-feature)
-
-Commit your changes
-
-Open a Pull Request
+-Contributions are welcome!
+-Fork the repo
+-Create a new branch (feature/my-feature)
+-Commit your changes
+-Open a Pull Request
